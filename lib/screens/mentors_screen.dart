@@ -13,6 +13,7 @@ class MentorsScreen extends StatefulWidget {
 class _MentorsScreenState extends State<MentorsScreen> with SingleTickerProviderStateMixin {
   int _bottomNavSelectedIndex = 1; // Default to 'Explore Mentors' for bottom nav
   late TabController _tabController;
+  String _searchQuery = ''; // Add state variable for search query
 
   // Define the colors from the image
   static const Color primaryColor = Color(0xFF0A004A); // Dark blue
@@ -57,7 +58,7 @@ class _MentorsScreenState extends State<MentorsScreen> with SingleTickerProvider
     },
     {
       'imagepath': 'assets/images/pro_pic.png',
-      'name': 'Gaurav Samant',
+      'name': 'Ramesh Kumar',
       'rating': 4.9,
       'sector': 'IT Sector',
       'experience': '4 years',
@@ -100,6 +101,40 @@ class _MentorsScreenState extends State<MentorsScreen> with SingleTickerProvider
   void _onMentorTabChanged(int index) {
     // This callback is from MentorsTabBar, can be used if needed
     // For now, TabController handles the state
+  }
+
+  void _updateSearchQuery(String newQuery) {
+    setState(() {
+      _searchQuery = newQuery;
+    });
+  }
+
+  Widget _buildMentorList() {
+    // Filter the dummy mentors based on the search query
+    final filteredMentors = _dummyMentors.where((mentor) {
+      final nameLower = mentor['name'].toLowerCase();
+      final sectorLower = mentor['sector'].toLowerCase();
+      final queryLower = _searchQuery.toLowerCase();
+      return nameLower.contains(queryLower) || sectorLower.contains(queryLower);
+    }).toList();
+
+    return ListView.builder(
+      padding: const EdgeInsets.only(top: 8.0), // Add some padding above the list
+      itemCount: filteredMentors.length,
+      itemBuilder: (context, index) {
+        final mentor = filteredMentors[index];
+        return MentorCardWidget(
+          imagepath: mentor['imagepath'],
+          name: mentor['name'],
+          rating: mentor['rating'],
+          sector: mentor['sector'],
+          experience: mentor['experience'],
+          reviews: mentor['reviews'],
+          description: mentor['description'],
+          compatibility: mentor['compatibility'],
+        );
+      },
+    );
   }
 
   @override
@@ -161,9 +196,9 @@ class _MentorsScreenState extends State<MentorsScreen> with SingleTickerProvider
                   color: accentColor,
                   child: Column(
                     children: [
-                      const SearchBarWidget(),
+                      SearchBarWidget(onChanged: _updateSearchQuery), // Connect SearchBarWidget to filtering
                       Expanded(
-                        child: _buildExploreMentorsList(),
+                        child: _buildMentorList(),
                       ),
                     ],
                   ),

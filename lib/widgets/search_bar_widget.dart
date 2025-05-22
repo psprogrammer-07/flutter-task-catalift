@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
 class SearchBarWidget extends StatelessWidget {
-  const SearchBarWidget({super.key});
+  final Function(String) onChanged;
+  const SearchBarWidget({super.key, required this.onChanged});
 
   static const Color accentColor = Color(0xFFF0F0F0); // Light grey for background
   static const Color hintTextColor = Colors.grey;
@@ -31,9 +32,7 @@ class SearchBarWidget extends StatelessWidget {
             borderSide: BorderSide(color: Theme.of(context).primaryColor, width: 1.5),
           ),
         ),
-        onChanged: (value) {
-          // TODO: Implement search functionality
-        },
+        onChanged: onChanged,
       ),
     );
   }
